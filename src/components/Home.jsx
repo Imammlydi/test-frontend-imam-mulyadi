@@ -18,7 +18,7 @@ const Home = () => {
             <Link key={product.id} to={`/product/${product.id}`} className="border p-4 flex flex-col items-center bg-white shadow rounded">
               <img src={product.image} alt={product.name} className="w-full h-auto mb-4 object-cover" />
               <h2 className="text-xl text-center">{product.name}</h2>
-              <p className="text-center">${product.price}</p>
+              <p className="text-center">Rp {product.price}</p>
             </Link>
           ))}
         </div>
