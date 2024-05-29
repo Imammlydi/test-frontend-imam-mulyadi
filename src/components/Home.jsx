@@ -1,13 +1,9 @@
-import React, {useState,useEffect} from 'react';
-import {Link} from 'react-router-dom';
-import productsData from '../assets/products.json'; 
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    setProducts(productsData); 
-  }, []);
+  const products = useSelector(state => state.product);
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center bg-gray-100">

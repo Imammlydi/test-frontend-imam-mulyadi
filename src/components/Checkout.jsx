@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { clearCart, updateQuantity } from '../features/cart/cartSlice';
 import { useNavigate } from 'react-router-dom';
 
 const Checkout = () => {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
-  const [cart, setCart] = useState([]);
   const [warning, setWarning] = useState('');
+  const cart = useSelector(state => state.cart);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-    setCart(storedCart);
-  }, []);
+  const handleQuantityChange = (id, quantity) => {
+    dispatch(updateQuantity({ id, quantity }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -22,11 +24,15 @@ const Checkout = () => {
       return;
     }
 
-    console.log('Order submitted', { name, address, paymentMethod, cart });
+    const updatedCart = cart.map(item => ({
+      ...item,
+      quantity: parseInt(document.getElementById(`quantity-${item.id}`).value)
+    }));
+
+    localStorage.setItem('purchaseInfo', JSON.stringify({ name, address, paymentMethod, cart: updatedCart }));
     
-    localStorage.setItem('purchaseInfo', JSON.stringify({ name, address, paymentMethod, cart }));
-    localStorage.removeItem('cart');
-    
+    dispatch(clearCart());
+
     alert('Order placed successfully');
     navigate('/confirmation');
   };
@@ -71,8 +77,31 @@ const Checkout = () => {
             <h2 className="text-xl font-semibold mb-2">Cart:</h2>
             <ul>
               {cart.map((product, index) => (
-                <li key={index}>
-                  {product.name} - Rp{product.price}
+                <li key={index} className="flex items-center justify-between">
+                  <span>{product.name} - Rp{product.price}</span>
+                  <div className="flex items-center">
+                    <button
+                      type="button"
+                      onClick={() => handleQuantityChange(product.id, Math.max(1, product.quantity - 1))}
+                      className="bg-gray-200 p-2 rounded-l"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      id={`quantity-${product.id}`}
+                      value={product.quantity}
+                      onChange={e => handleQuantityChange(product.id, Math.max(1, parseInt(e.target.value)))}
+                      className="w-12 text-center border-t border-b p-2"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleQuantityChange(product.id, product.quantity + 1)}
+                      className="bg-gray-200 p-2 rounded-r"
+                    >
+                      +
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>

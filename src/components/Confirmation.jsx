@@ -1,19 +1,18 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 const Confirmation = () => {
   const purchaseInfo = JSON.parse(localStorage.getItem('purchaseInfo')) || {};
   const { name, address, paymentMethod, cart } = purchaseInfo;
 
-  const cartItems = cart || [];
+  const hasCartItems = cart && cart.length > 0;
 
-  const hasCartItems = cartItems.length > 0;
-
-  const groupedCartItems = cartItems.reduce((groupedItems, item) => {
+  const groupedCartItems = cart.reduce((groupedItems, item) => {
     if (!groupedItems[item.id]) {
-      groupedItems[item.id] = { ...item, quantity: 1 };
+      groupedItems[item.id] = { ...item, quantity: item.quantity };
     } else {
-      groupedItems[item.id].quantity += 1;
+      groupedItems[item.id].quantity += item.quantity;
     }
     return groupedItems;
   }, {});
